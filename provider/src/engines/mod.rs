@@ -36,6 +36,7 @@ use std::sync::Arc;
 
 #[cfg(feature = "native_mlx")]
 pub mod native_mlx;
+pub mod openai;
 pub mod stub;
 pub mod subprocess;
 
@@ -151,6 +152,13 @@ pub struct GenerateRequest {
     pub max_tokens: u32,
     pub temperature: Option<f32>,
     pub top_p: Option<f32>,
+    /// RNG seed for deterministic generation. When set alongside
+    /// `temperature = Some(0.0)`, backends that support seeding (llama.cpp,
+    /// Ollama, vLLM) produce the same output for the same input. This is the
+    /// basis for the verification path: the receipt commits to the seed via
+    /// `params.seed`, and a third party can reproduce the inference to confirm
+    /// the output commitment. See `crate::determinism`.
+    pub seed: Option<u64>,
 }
 
 /// Result of a non-streaming inference call.
